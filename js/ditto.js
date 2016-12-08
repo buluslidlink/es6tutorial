@@ -152,23 +152,24 @@ function goSection(sectionId){
 }
 
 function init_edit_button() {
-    if (ditto.base_url === null) {
-        alert("Error! You didn't set 'base_url' when calling ditto.run()!");
+  if (ditto.base_url === null) {
+    alert("Error! You didn't set 'base_url' when calling ditto.run()!");
+  } else {
+    $(ditto.edit_id).show();
+    $(ditto.edit_id).on("click", function() {
+      var hash = location.hash.replace("#", "/");
+      if (/#.*$/.test(hash)) {
+        hash = hash.replace(/#.*$/, '');
+      }
+      if (hash === "") {
+        hash = "/" + ditto.index.replace(".md", "");
+      }
 
-    } else {
-        $(ditto.edit_id).show();
-        $(ditto.edit_id).on("click", function() {
-            var hash = location.hash.replace("#", "/");
-
-            if (hash === "") {
-                hash = "/" + ditto.index.replace(".md", "");
-            }
-
-            window.open(ditto.base_url + hash + ".md");
-            // open is better than redirecting, as the previous page history
-            // with redirect is a bit messed up
-        });
-    }
+      window.open(ditto.base_url + hash + ".md");
+      // open is better than redirecting, as the previous page history
+      // with redirect is a bit messed up
+    });
+  }
 }
 
 function replace_symbols(text) {
@@ -255,7 +256,7 @@ function normalize_paths() {
   // images
   $(ditto.content_id + " img").map(function() {
     var src = $(this).attr("src").replace("./", "");
-    if ($(this).attr("src").slice(0, 5) !== "http") {
+    if ($(this).attr("src").slice(0, 4) !== "http") {
       var pathname = location.pathname.substr(0, location.pathname.length - 1);
       var url = location.hash.replace("#", "");
 

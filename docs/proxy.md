@@ -1,10 +1,10 @@
-# Proxy和Reflect
+# Proxy 和 Reflect
 
-## Proxy概述
+## Proxy 概述
 
-Proxy用于修改某些操作的默认行为，等同于在语言层面做出修改，所以属于一种“元编程”（meta programming），即对编程语言进行编程。
+Proxy 用于修改某些操作的默认行为，等同于在语言层面做出修改，所以属于一种“元编程”（meta programming），即对编程语言进行编程。
 
-Proxy可以理解成，在目标对象之前架设一层“拦截”，外界对该对象的访问，都必须先通过这层拦截，因此提供了一种机制，可以对外界的访问进行过滤和改写。Proxy这个词的原意是代理，用在这里表示由它来“代理”某些操作，可以译为“代理器”。
+Proxy 可以理解成，在目标对象之前架设一层“拦截”，外界对该对象的访问，都必须先通过这层拦截，因此提供了一种机制，可以对外界的访问进行过滤和改写。Proxy 这个词的原意是代理，用在这里表示由它来“代理”某些操作，可以译为“代理器”。
 
 ```javascript
 var obj = new Proxy({}, {
@@ -30,15 +30,15 @@ obj.count = 1
 //  2
 ```
 
-上面代码说明，Proxy实际上重载（overload）了点运算符，即用自己的定义覆盖了语言的原始定义。
+上面代码说明，Proxy 实际上重载（overload）了点运算符，即用自己的定义覆盖了语言的原始定义。
 
-ES6原生提供Proxy构造函数，用来生成Proxy实例。
+ES6 原生提供 Proxy 构造函数，用来生成 Proxy 实例。
 
 ```javascript
 var proxy = new Proxy(target, handler);
 ```
 
-Proxy对象的所有用法，都是上面这种形式，不同的只是`handler`参数的写法。其中，`new Proxy()`表示生成一个Proxy实例，target参数表示所要拦截的目标对象，`handler`参数也是一个对象，用来定制拦截行为。
+Proxy 对象的所有用法，都是上面这种形式，不同的只是`handler`参数的写法。其中，`new Proxy()`表示生成一个`Proxy`实例，`target`参数表示所要拦截的目标对象，`handler`参数也是一个对象，用来定制拦截行为。
 
 下面是另一个拦截读取属性行为的例子。
 
@@ -54,9 +54,9 @@ proxy.name // 35
 proxy.title // 35
 ```
 
-上面代码中，作为构造函数，Proxy接受两个参数。第一个参数是所要代理的目标对象（上例是一个空对象），即如果没有Proxy的介入，操作原来要访问的就是这个对象；第二个参数是一个配置对象，对于每一个被代理的操作，需要提供一个对应的处理函数，该函数将拦截对应的操作。比如，上面代码中，配置对象有一个`get`方法，用来拦截对目标对象属性的访问请求。`get`方法的两个参数分别是目标对象和所要访问的属性。可以看到，由于拦截函数总是返回`35`，所以访问任何属性都得到`35`。
+上面代码中，作为构造函数，`Proxy`接受两个参数。第一个参数是所要代理的目标对象（上例是一个空对象），即如果没有`Proxy`的介入，操作原来要访问的就是这个对象；第二个参数是一个配置对象，对于每一个被代理的操作，需要提供一个对应的处理函数，该函数将拦截对应的操作。比如，上面代码中，配置对象有一个`get`方法，用来拦截对目标对象属性的访问请求。`get`方法的两个参数分别是目标对象和所要访问的属性。可以看到，由于拦截函数总是返回`35`，所以访问任何属性都得到`35`。
 
-注意，要使得Proxy起作用，必须针对Proxy实例（上例是proxy对象）进行操作，而不是针对目标对象（上例是空对象）进行操作。
+注意，要使得`Proxy`起作用，必须针对`Proxy`实例（上例是`proxy`对象）进行操作，而不是针对目标对象（上例是空对象）进行操作。
 
 如果`handler`没有设置任何拦截，那就等同于直接通向原对象。
 
@@ -68,7 +68,7 @@ proxy.a = 'b';
 target.a // "b"
 ```
 
-上面代码中，`handler`是一个空对象，没有任何拦截效果，访问`handeler`就等同于访问`target`。
+上面代码中，`handler`是一个空对象，没有任何拦截效果，访问`handler`就等同于访问`target`。
 
 一个技巧是将Proxy对象，设置到`object.proxy`属性，从而可以在`object`对象上调用。
 
@@ -76,7 +76,7 @@ target.a // "b"
 var object = { proxy: new Proxy(target, handler) };
 ```
 
-Proxy实例也可以作为其他对象的原型对象。
+Proxy 实例也可以作为其他对象的原型对象。
 
 ```javascript
 var proxy = new Proxy({}, {
@@ -121,13 +121,15 @@ fproxy.prototype === Object.prototype // true
 fproxy.foo // "Hello, foo"
 ```
 
-下面是Proxy支持的拦截操作一览。
+下面是 Proxy 支持的拦截操作一览。
 
 对于可以设置、但没有设置拦截的操作，则直接落在目标对象上，按照原先的方式产生结果。
 
 **（1）get(target, propKey, receiver)**
 
-拦截对象属性的读取，比如`proxy.foo`和`proxy['foo']`，返回类型不限。最后一个参数`receiver`可选，当`target`对象设置了`propKey`属性的`get`函数时，`receiver`对象会绑定`get`函数的`this`对象。
+拦截对象属性的读取，比如`proxy.foo`和`proxy['foo']`。
+
+最后一个参数`receiver`是一个对象，可选，参见下面`Reflect.get`的部分。
 
 **（2）set(target, propKey, value, receiver)**
 
@@ -173,11 +175,11 @@ fproxy.foo // "Hello, foo"
 
 **（12）apply(target, object, args)**
 
-拦截Proxy实例作为函数调用的操作，比如`proxy(...args)`、`proxy.call(object, ...args)`、`proxy.apply(...)`。
+拦截 Proxy 实例作为函数调用的操作，比如`proxy(...args)`、`proxy.call(object, ...args)`、`proxy.apply(...)`。
 
 **（13）construct(target, args)**
 
-拦截Proxy实例作为构造函数调用的操作，比如`new proxy(...args)`。
+拦截 Proxy 实例作为构造函数调用的操作，比如`new proxy(...args)`。
 
 ## Proxy实例的方法
 
@@ -222,7 +224,7 @@ let obj = Object.create(proto);
 obj.xxx // "GET xxx"
 ```
 
-上面代码中，拦截操作定义在Prototype对象上面，所以如果读取`obj`对象继承的属性时，拦截会生效。
+上面代码中，拦截操作定义在`Prototype`对象上面，所以如果读取`obj`对象继承的属性时，拦截会生效。
 
 下面的例子使用`get`拦截，实现数组读取负数的索引。
 
@@ -249,7 +251,7 @@ arr[-1] // c
 
 上面代码中，数组的位置参数是`-1`，就会输出数组的倒数最后一个成员。
 
-利用Proxy，可以将读取属性的操作（`get`），转变为执行某个函数，从而实现属性的链式操作。
+利用 Proxy，可以将读取属性的操作（`get`），转变为执行某个函数，从而实现属性的链式操作。
 
 ```javascript
 var pipe = (function () {
@@ -278,7 +280,7 @@ var reverseInt = n => n.toString().split("").reverse().join("") | 0;
 pipe(3).double.pow.reverseInt.get; // 63
 ```
 
-上面代码设置Proxy以后，达到了将函数名链式使用的效果。
+上面代码设置 Proxy 以后，达到了将函数名链式使用的效果。
 
 下面的例子则是利用`get`拦截，实现一个生成各种DOM节点的通用函数`dom`。
 
@@ -359,6 +361,7 @@ var handler = {
   },
   set (target, key, value) {
     invariant(key, 'set');
+    target[key] = value;
     return true;
   }
 };
@@ -472,11 +475,13 @@ var p = new Proxy(obj, {
 
 上面代码中，`obj`对象禁止扩展，结果使用`has`拦截就会报错。
 
-值得注意的是，`has`方法拦截的是`HasProperty`操作，而不是`HasOwnProperty`操作，即`has`方法不判断一个属性是对象自身的属性，还是继承的属性。由于`for...in`操作内部也会用到`HasProperty`操作，所以`has`方法在`for...in`循环时也会生效。
+值得注意的是，`has`方法拦截的是`HasProperty`操作，而不是`HasOwnProperty`操作，即`has`方法不判断一个属性是对象自身的属性，还是继承的属性。
+
+另外，虽然`for...in`循环也用到了`in`运算符，但是`has`拦截对`for...in`循环不生效。
 
 ```javascript
-let stu1 = {name: 'Owen', score: 59};
-let stu2 = {name: 'Mark', score: 99};
+let stu1 = {name: '张三', score: 59};
+let stu2 = {name: '李四', score: 99};
 
 let handler = {
   has(target, prop) {
@@ -491,20 +496,27 @@ let handler = {
 let oproxy1 = new Proxy(stu1, handler);
 let oproxy2 = new Proxy(stu2, handler);
 
+'score' in oproxy1
+// 张三 不及格
+// false
+
+'score' in oproxy2
+// true
+
 for (let a in oproxy1) {
   console.log(oproxy1[a]);
 }
-// Owen
-// Owen 不及格
+// 张三
+// 59
 
 for (let b in oproxy2) {
   console.log(oproxy2[b]);
 }
-// Mark
-// Mark 99
+// 李四
+// 99
 ```
 
-上面代码中，`for...in`循环时，`has`拦截会生效，导致不符合要求的属性被排除在`for...in`循环之外。
+上面代码中，`has`拦截只对`in`循环生效，对`for...in`循环不生效，导致不符合要求的属性没有被排除在`for...in`循环之外。
 
 ### construct()
 
@@ -796,6 +808,77 @@ proxy.foo // TypeError: Revoked
 
 `Proxy.revocable`方法返回一个对象，该对象的`proxy`属性是`Proxy`实例，`revoke`属性是一个函数，可以取消`Proxy`实例。上面代码中，当执行`revoke`函数之后，再访问`Proxy`实例，就会抛出一个错误。
 
+## this 问题
+
+虽然 Proxy 可以代理针对目标对象的访问，但它不是目标对象的透明代理，即不做任何拦截的情况下，也无法保证与目标对象的行为一致。主要原因就是在 Proxy 代理的情况下，目标对象内部的`this`关键字会指向 Proxy 代理。
+
+```javascript
+const target = {
+  m: function () {
+    console.log(this === proxy);
+  }
+};
+const handler = {};
+
+const proxy = new Proxy(target, handler);
+
+target.m() // false
+proxy.m()  // true
+```
+
+上面代码中，一旦`proxy`代理`target.m`，后者内部的`this`就是指向`proxy`，而不是`target`。
+
+下面是一个例子，由于`this`指向的变化，导致 Proxy 无法代理目标对象。
+
+```javascript
+const _name = new WeakMap();
+
+class Person {
+  constructor(name) {
+    _name.set(this, name);
+  }
+  get name() {
+    return _name.get(this);
+  }
+}
+
+const jane = new Person('Jane');
+jane.name // 'Jane'
+
+const proxy = new Proxy(jane, {});
+proxy.name // undefined
+```
+
+上面代码中，目标对象`jane`的`name`属性，实际保存在外部`WeakMap`对象`_name`上面，通过`this`键区分。由于通过`proxy.name`访问时，`this`指向`proxy`，导致无法取到值，所以返回`undefined`。
+
+此外，有些原生对象的内部属性，只有通过正确的`this`才能拿到，所以 Proxy 也无法代理这些原生对象的属性。
+
+```javascript
+const target = new Date();
+const handler = {};
+const proxy = new Proxy(target, handler);
+
+proxy.getDate();
+// TypeError: this is not a Date object.
+```
+
+上面代码中，`getDate`方法只能在`Date`对象实例上面拿到，如果`this`不是`Date`对象实例就会报错。这时，`this`绑定原始对象，就可以解决这个问题。
+
+```javascript
+const target = new Date('2015-01-01');
+const handler = {
+  get(target, prop) {
+    if (prop === 'getDate') {
+      return target.getDate.bind(target);
+    }
+    return Reflect.get(target, prop);
+  }
+};
+const proxy = new Proxy(target, handler);
+
+proxy.getDate() // 1
+```
+
 ## Reflect概述
 
 `Reflect`对象与`Proxy`对象一样，也是ES6为了操作对象而提供的新API。`Reflect`对象的设计目的有这样几个。
@@ -902,7 +985,7 @@ Reflect.apply(Math.floor, undefined, [1.75]) // 1
 
 查找并返回`target`对象的`name`属性，如果没有该属性，则返回`undefined`。
 
-如果`name`属性部署了读取函数，则读取函数的this绑定`receiver`。
+如果`name`属性部署了读取函数，则读取函数的`this`绑定`receiver`。
 
 ```javascript
 var obj = {
@@ -953,3 +1036,43 @@ Reflect.defineProperty(obj, name, desc);
 ```
 
 上面代码中，`Reflect.defineProperty`方法的作用与`Object.defineProperty`是一样的，都是为对象定义一个属性。但是，`Reflect.defineProperty`方法失败时，不会抛出错误，只会返回`false`。
+
+## 实例：使用 Proxy 实现观察者模式
+
+观察者模式（Observer mode）指的是函数自动观察数据对象，一旦对象有变化，函数就会自动执行。
+
+```javascript
+const person = observable({
+  name: '张三',
+  age: 20
+});
+
+function print() {
+  console.log(`${person.name}, ${person.age}`)
+}
+
+observe(print);
+person.name = '李四';
+// 输出
+// 李四, 20
+```
+
+上面代码中，数据对象`person`是观察目标，函数`print`是观察者。一旦数据对象发生变化，`print`就会自动执行。
+
+下面，使用 Proxy 写一个观察者模式的最简单实现，即实现`observable`和`observe`这两个函数。思路是`observable`函数返回一个原始对象的 Proxy 代理，拦截赋值操作，触发充当观察者的各个函数。
+
+```javascript
+const queuedObservers = new Set();
+
+const observe = fn => queuedObservers.add(fn);
+const observable = obj => new Proxy(obj, {set});
+
+function set(target, key, value, receiver) {
+  const result = Reflect.set(target, key, value, receiver);
+  queuedObservers.forEach(observer => observer());
+  return result;
+}
+```
+
+上面代码中，先定义了一个`Set`集合，所有观察者函数都放进这个集合。然后，`observable`函数返回原始对象的代理，拦截赋值操作。拦截函数`set`之中，会自动执行所有观察者。
+

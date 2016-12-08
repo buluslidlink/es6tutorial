@@ -242,7 +242,7 @@ function f(y = x) {
 f() // 1
 ```
 
-上面代码中，函数调用时，`y`的默认值变量`x`尚未在函数内部生成，所以`x`指向全局变量，结果又不一样。
+上面代码中，函数调用时，`y`的默认值变量`x`尚未在函数内部生成，所以`x`指向全局变量。
 
 如果此时，全局变量`x`不存在，就会报错。
 
@@ -255,7 +255,21 @@ function f(y = x) {
 f() // ReferenceError: x is not defined
 ```
 
-如果函数`A`的参数默认值是函数`B`，由于函数的作用域是其声明时所在的作用域，那么函数`B`的作用域不是函数`A`，而是全局作用域。请看下面的例子。
+下面这样写，也会报错。
+
+```javascript
+var x = 1;
+
+function foo(x = x) {
+  // ...
+}
+
+foo() // ReferenceError: x is not defined
+```
+
+上面代码中，函数`foo`的参数`x`的默认值也是`x`。这时，默认值`x`的作用域是函数作用域，而不是全局作用域。由于在函数作用域中，存在变量`x`，但是默认值在`x`赋值之前先执行了，所以这时属于暂时性死区（参见《let和const命令》一章），任何对`x`的操作都会报错。
+
+如果参数的默认值是一个函数，该函数的作用域是其声明时所在的作用域。请看下面的例子。
 
 ```javascript
 let foo = 'outer';
@@ -268,19 +282,7 @@ function bar(func = x => foo) {
 bar();
 ```
 
-上面代码中，函数`bar`的参数`func`，默认是一个匿名函数，返回值为变量`foo`。这个匿名函数的作用域就不是`bar`。这个匿名函数声明时，是处在外层作用域，所以内部的`foo`指向函数体外的声明，输出`outer`。它实际上等同于下面的代码。
-
-```javascript
-let foo = 'outer';
-let f = x => foo;
-
-function bar(func = f) {
-  let foo = 'inner';
-  console.log(func()); // outer
-}
-
-bar();
-```
+上面代码中，函数`bar`的参数`func`的默认值是一个匿名函数，返回值为变量`foo`。这个匿名函数声明时，`bar`函数的作用域还没有形成，所以匿名函数里面的`foo`指向外层作用域的`foo`，输出`outer`。
 
 如果写成下面这样，就会报错。
 
@@ -291,6 +293,36 @@ function bar(func = () => foo) {
 }
 
 bar() // ReferenceError: foo is not defined
+```
+
+上面代码中，匿名函数里面的`foo`指向函数外层，但是函数外层并没有声明`foo`，所以就报错了。
+
+下面是一个更复杂的例子。
+
+```javascript
+var x = 1;
+function foo(x, y = function() { x = 2; }) {
+  var x = 3;
+  y();
+  console.log(x);
+}
+
+foo() // 3
+```
+
+上面代码中，函数`foo`的参数`y`的默认值是一个匿名函数。函数`foo`调用时，它的参数`x`的值为`undefined`，所以`y`函数内部的`x`一开始是`undefined`，后来被重新赋值`2`。但是，函数`foo`内部重新声明了一个`x`，值为`3`，这两个`x`是不一样的，互相不产生影响，因此最后输出`3`。
+
+如果将`var x = 3`的`var`去除，两个`x`就是一样的，最后输出的就是`2`。
+
+```javascript
+var x = 1;
+function foo(x, y = function() { x = 2; }) {
+  x = 3;
+  y();
+  console.log(x);
+}
+
+foo() // 2
 ```
 
 ### 应用
@@ -662,6 +694,82 @@ var obj = {a: 1, b: 2};
 let arr = [...obj]; // TypeError: Cannot spread non-iterable object
 ```
 
+## 严格模式
+
+从ES5开始，函数内部可以设定为严格模式。
+
+```javascript
+function doSomething(a, b) {
+  'use strict';
+  // code
+}
+```
+
+《ECMAScript 2016标准》做了一点修改，规定只要函数参数使用了默认值、解构赋值、或者扩展运算符，那么函数内部就不能显式设定为严格模式，否则会报错。
+
+```javascript
+// 报错
+function doSomething(a, b = a) {
+  'use strict';
+  // code
+}
+
+// 报错
+const doSomething = function ({a, b}) {
+  'use strict';
+  // code
+};
+
+// 报错
+const doSomething = (...a) => {
+  'use strict';
+  // code
+};
+
+const obj = {
+  // 报错
+  doSomething({a, b}) {
+    'use strict';
+    // code
+  }
+};
+```
+
+这样规定的原因是，函数内部的严格模式，同时适用于函数体代码和函数参数代码。但是，函数执行的时候，先执行函数参数代码，然后再执行函数体代码。这样就有一个不合理的地方，只有从函数体代码之中，才能知道参数代码是否应该以严格模式执行，但是参数代码却应该先于函数体代码执行。
+
+```javascript
+// 报错
+function doSomething(value = 070) {
+  'use strict';
+  return value;
+}
+```
+
+上面代码中，参数`value`的默认值是八进制数`070`，但是严格模式下不能用前缀`0`表示八进制，所以应该报错。但是实际上，JavaScript引擎会先成功执行`value = 070`，然后进入函数体内部，发现需要用严格模式执行，这时才会报错。
+
+虽然可以先解析函数体代码，再执行参数代码，但是这样无疑就增加了复杂性。因此，标准索性禁止了这种用法，只要参数使用了默认值、解构赋值、或者扩展运算符，就不能显式指定严格模式。
+
+两种方法可以规避这种限制。第一种是设定全局性的严格模式，这是合法的。
+
+```javascript
+'use strict';
+
+function doSomething(a, b = a) {
+  // code
+}
+```
+
+第二种是把函数包在一个无参数的立即执行函数里面。
+
+```javascript
+const doSomething = (function () {
+  'use strict';
+  return function(value = 42) {
+    return value;
+  };
+}());
+```
+
 ## name属性
 
 函数的`name`属性，返回该函数的函数名。
@@ -1029,7 +1137,7 @@ var fix = f => (x => f(v => x(x)(v)))
 
 上面两种写法，几乎是一一对应的。由于λ演算对于计算机科学非常重要，这使得我们可以用ES6作为替代工具，探索计算机科学。
 
-## 函数绑定
+## 绑定 this
 
 箭头函数可以绑定`this`对象，大大减少了显式绑定`this`对象的写法（`call`、`apply`、`bind`）。但是，箭头函数并不适用于所有场合，所以ES7提出了“函数绑定”（function bind）运算符，用来取代`call`、`apply`、`bind`调用。虽然该语法还是ES7的一个[提案](https://github.com/zenparsing/es-function-bind)，但是Babel转码器已经支持。
 
@@ -1216,7 +1324,7 @@ factorial(5, 1) // 120
 ```javascript
 function Fibonacci (n) {
   if ( n <= 1 ) {return 1};
-  
+
   return Fibonacci(n - 1) + Fibonacci(n - 2);
 }
 
@@ -1230,13 +1338,13 @@ Fibonacci(10); // 89
 
 ```javascript
 function Fibonacci2 (n , ac1 = 1 , ac2 = 1) {
-  if( n <= 1 ) {return ac1};
-  
-  return Fibonacci2 (n-1 , ac2 , ac1 + ac2);
+  if( n <= 1 ) {return ac2};
+
+  return Fibonacci2 (n - 1, ac2, ac1 + ac2);
 }
 
-Fibonacci2(100) // 354224848179262000000
-Fibonacci2(1000) // 4.346655768693743e+208
+Fibonacci2(100) // 573147844013817200000
+Fibonacci2(1000) // 7.0330367711422765e+208
 Fibonacci2(10000) // Infinity
 ```
 
@@ -1414,9 +1522,9 @@ sum(1, 100000)
 
 ## 函数参数的尾逗号
 
-ES7有一个[提案](https://github.com/jeffmo/es-trailing-function-commas)，允许函数的最后一个参数有尾逗号（trailing comma）。
+ECMAScript 2017将[允许](https://github.com/jeffmo/es-trailing-function-commas)函数的最后一个参数有尾逗号（trailing comma）。
 
-目前，函数定义和调用时，都不允许有参数的尾逗号。
+此前，函数定义和调用时，都不允许最后一个参数后面出现逗号。
 
 ```javascript
 function clownsEverywhere(
@@ -1430,7 +1538,9 @@ clownsEverywhere(
 );
 ```
 
-如果以后要在函数的定义之中添加参数，就势必还要添加一个逗号。这对版本管理系统来说，就会显示，添加逗号的那一行也发生了变动。这看上去有点冗余，因此新提案允许定义和调用时，尾部直接有一个逗号。
+上面代码中，如果在`param2`或`bar`后面加一个逗号，就会报错。
+
+这样的话，如果以后修改代码，想为函数`clownsEverywhere`添加第三个参数，就势必要在第二个参数后面添加一个逗号。这对版本管理系统来说，就会显示，添加逗号的那一行也发生了变动。这看上去有点冗余，因此新的语法允许定义和调用时，尾部直接有一个逗号。
 
 ```javascript
 function clownsEverywhere(
