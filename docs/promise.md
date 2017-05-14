@@ -1,22 +1,22 @@
-# Promise对象
+# Promise 对象
 
-## Promise的含义
+## Promise 的含义
 
-Promise是异步编程的一种解决方案，比传统的解决方案——回调函数和事件——更合理和更强大。它由社区最早提出和实现，ES6将其写进了语言标准，统一了用法，原生提供了`Promise`对象。
+Promise 是异步编程的一种解决方案，比传统的解决方案——回调函数和事件——更合理和更强大。它由社区最早提出和实现，ES6将其写进了语言标准，统一了用法，原生提供了`Promise`对象。
 
-所谓`Promise`，简单说就是一个容器，里面保存着某个未来才会结束的事件（通常是一个异步操作）的结果。从语法上说，Promise是一个对象，从它可以获取异步操作的消息。Promise提供统一的API，各种异步操作都可以用同样的方法进行处理。
+所谓`Promise`，简单说就是一个容器，里面保存着某个未来才会结束的事件（通常是一个异步操作）的结果。从语法上说，Promise 是一个对象，从它可以获取异步操作的消息。Promise 提供统一的 API，各种异步操作都可以用同样的方法进行处理。
 
 `Promise`对象有以下两个特点。
 
-（1）对象的状态不受外界影响。`Promise`对象代表一个异步操作，有三种状态：`Pending`（进行中）、`Resolved`（已完成，又称Fulfilled）和`Rejected`（已失败）。只有异步操作的结果，可以决定当前是哪一种状态，任何其他操作都无法改变这个状态。这也是`Promise`这个名字的由来，它的英语意思就是“承诺”，表示其他手段无法改变。
+（1）对象的状态不受外界影响。`Promise`对象代表一个异步操作，有三种状态：`Pending`（进行中）、`Resolved`（已完成，又称 Fulfilled）和`Rejected`（已失败）。只有异步操作的结果，可以决定当前是哪一种状态，任何其他操作都无法改变这个状态。这也是`Promise`这个名字的由来，它的英语意思就是“承诺”，表示其他手段无法改变。
 
-（2）一旦状态改变，就不会再变，任何时候都可以得到这个结果。`Promise`对象的状态改变，只有两种可能：从`Pending`变为`Resolved`和从`Pending`变为`Rejected`。只要这两种情况发生，状态就凝固了，不会再变了，会一直保持这个结果。就算改变已经发生了，你再对`Promise`对象添加回调函数，也会立即得到这个结果。这与事件（Event）完全不同，事件的特点是，如果你错过了它，再去监听，是得不到结果的。
+（2）一旦状态改变，就不会再变，任何时候都可以得到这个结果。`Promise`对象的状态改变，只有两种可能：从`Pending`变为`Resolved`和从`Pending`变为`Rejected`。只要这两种情况发生，状态就凝固了，不会再变了，会一直保持这个结果。如果改变已经发生了，你再对`Promise`对象添加回调函数，也会立即得到这个结果。这与事件（Event）完全不同，事件的特点是，如果你错过了它，再去监听，是得不到结果的。
 
 有了`Promise`对象，就可以将异步操作以同步操作的流程表达出来，避免了层层嵌套的回调函数。此外，`Promise`对象提供统一的接口，使得控制异步操作更加容易。
 
 `Promise`也有一些缺点。首先，无法取消`Promise`，一旦新建它就会立即执行，无法中途取消。其次，如果不设置回调函数，`Promise`内部抛出的错误，不会反应到外部。第三，当处于`Pending`状态时，无法得知目前进展到哪一个阶段（刚刚开始还是即将完成）。
 
-如果某些事件不断地反复发生，一般来说，使用stream模式是比部署`Promise`更好的选择。
+如果某些事件不断地反复发生，一般来说，使用 stream 模式是比部署`Promise`更好的选择。
 
 ## 基本用法
 
@@ -179,7 +179,7 @@ p2
 // Error: fail
 ```
 
-上面代码中，`p1`是一个Promise，3秒之后变为`rejected`。`p2`的状态在1秒之后改变，`resolve`方法返回的是`p1`。此时，由于`p2`返回的是另一个Promise，所以后面的`then`语句都变成针对后者（`p1`）。又过了2秒，`p1`变为`rejected`，导致触发`catch`方法指定的回调函数。
+上面代码中，`p1`是一个Promise，3秒之后变为`rejected`。`p2`的状态在1秒之后改变，`resolve`方法返回的是`p1`。由于`p2`返回的是另一个 Promise，导致`p2`自己的状态无效了，由`p1`的状态决定`p2`的状态。所以，后面的`then`语句都变成针对后者（`p1`）。又过了2秒，`p1`变为`rejected`，导致触发`catch`方法指定的回调函数。
 
 ## Promise.prototype.then()
 
@@ -227,7 +227,7 @@ getJSON("/post/1.json").then(
 `Promise.prototype.catch`方法是`.then(null, rejection)`的别名，用于指定发生错误时的回调函数。
 
 ```javascript
-getJSON("/posts.json").then(function(posts) {
+getJSON('/posts.json').then(function(posts) {
   // ...
 }).catch(function(error) {
   // 处理 getJSON 和 前一个回调函数运行时发生的错误
@@ -235,14 +235,14 @@ getJSON("/posts.json").then(function(posts) {
 });
 ```
 
-上面代码中，`getJSON`方法返回一个Promise对象，如果该对象状态变为`Resolved`，则会调用`then`方法指定的回调函数；如果异步操作抛出错误，状态就会变为`Rejected`，就会调用`catch`方法指定的回调函数，处理这个错误。另外，`then`方法指定的回调函数，如果运行中抛出错误，也会被`catch`方法捕获。
+上面代码中，`getJSON`方法返回一个 Promise 对象，如果该对象状态变为`Resolved`，则会调用`then`方法指定的回调函数；如果异步操作抛出错误，状态就会变为`Rejected`，就会调用`catch`方法指定的回调函数，处理这个错误。另外，`then`方法指定的回调函数，如果运行中抛出错误，也会被`catch`方法捕获。
 
 ```javascript
-p.then((val) => console.log("fulfilled:", val))
-  .catch((err) => console.log("rejected:", err));
+p.then((val) => console.log('fulfilled:', val))
+  .catch((err) => console.log('rejected', err));
 
 // 等同于
-p.then((val) => console.log("fulfilled:", val))
+p.then((val) => console.log('fulfilled:', val))
   .then(null, (err) => console.log("rejected:", err));
 ```
 
@@ -297,12 +297,12 @@ promise
 // ok
 ```
 
-上面代码中，Promise在`resolve`语句后面，再抛出错误，不会被捕获，等于没有抛出。
+上面代码中，Promise 在`resolve`语句后面，再抛出错误，不会被捕获，等于没有抛出。因为 Promise 的状态一旦改变，就永久保持该状态，不会再变了。
 
-Promise对象的错误具有“冒泡”性质，会一直向后传递，直到被捕获为止。也就是说，错误总是会被下一个`catch`语句捕获。
+Promise 对象的错误具有“冒泡”性质，会一直向后传递，直到被捕获为止。也就是说，错误总是会被下一个`catch`语句捕获。
 
 ```javascript
-getJSON("/post/1.json").then(function(post) {
+getJSON('/post/1.json').then(function(post) {
   return getJSON(post.commentURL);
 }).then(function(comments) {
   // some code
@@ -355,7 +355,7 @@ someAsyncThing().then(function() {
 
 ```javascript
 var promise = new Promise(function(resolve, reject) {
-  resolve("ok");
+  resolve('ok');
   setTimeout(function() { throw new Error('test') }, 0)
 });
 promise.then(function(value) { console.log(value) });
@@ -363,9 +363,9 @@ promise.then(function(value) { console.log(value) });
 // Uncaught Error: test
 ```
 
-上面代码中，Promise指定在下一轮“事件循环”再抛出错误，结果由于没有指定使用`try...catch`语句，就冒泡到最外层，成了未捕获的错误。因为此时，Promise的函数体已经运行结束了，所以这个错误是在Promise函数体外抛出的。
+上面代码中，Promise 指定在下一轮“事件循环”再抛出错误，结果由于没有指定使用`try...catch`语句，就冒泡到最外层，成了未捕获的错误。因为此时，Promise的函数体已经运行结束了，所以这个错误是在Promise函数体外抛出的。
 
-Node.js有一个`unhandledRejection`事件，专门监听未捕获的`reject`错误。
+Node 有一个`unhandledRejection`事件，专门监听未捕获的`reject`错误。
 
 ```javascript
 process.on('unhandledRejection', function (err, p) {
@@ -375,7 +375,7 @@ process.on('unhandledRejection', function (err, p) {
 
 上面代码中，`unhandledRejection`事件的监听函数有两个参数，第一个是错误对象，第二个是报错的Promise实例，它可以用来了解发生错误的环境信息。。
 
-需要注意的是，`catch`方法返回的还是一个Promise对象，因此后面还可以接着调用`then`方法。
+需要注意的是，`catch`方法返回的还是一个 Promise 对象，因此后面还可以接着调用`then`方法。
 
 ```javascript
 var someAsyncThing = function() {
@@ -489,7 +489,7 @@ Promise.all(promises).then(function (posts) {
 ```javascript
 const databasePromise = connectDatabase();
 
-const booksPromise = databaseProimse
+const booksPromise = databasePromise
   .then(findAllBooks);
 
 const userPromise = databasePromise
@@ -519,14 +519,14 @@ var p = Promise.race([p1, p2, p3]);
 下面是一个例子，如果指定时间内没有获得结果，就将Promise的状态变为`reject`，否则变为`resolve`。
 
 ```javascript
-var p = Promise.race([
+const p = Promise.race([
   fetch('/resource-that-may-take-a-while'),
   new Promise(function (resolve, reject) {
     setTimeout(() => reject(new Error('request timeout')), 5000)
   })
-])
-p.then(response => console.log(response))
-p.catch(error => console.log(error))
+]);
+p.then(response => console.log(response));
+p.catch(error => console.log(error));
 ```
 
 上面代码中，如果5秒之内`fetch`方法无法返回结果，变量`p`的状态就会变为`rejected`，从而触发`catch`方法指定的回调函数。
@@ -597,7 +597,7 @@ p.then(function (s){
 // Hello
 ```
 
-上面代码生成一个新的Promise对象的实例`p`。由于字符串`Hello`不属于异步操作（判断方法是它不是具有then方法的对象），返回Promise实例的状态从一生成就是`Resolved`，所以回调函数会立即执行。`Promise.resolve`方法的参数，会同时传给回调函数。
+上面代码生成一个新的Promise对象的实例`p`。由于字符串`Hello`不属于异步操作（判断方法是字符串对象不具有then方法），返回Promise实例的状态从一生成就是`Resolved`，所以回调函数会立即执行。`Promise.resolve`方法的参数，会同时传给回调函数。
 
 **（4）不带有任何参数**
 
@@ -637,20 +637,38 @@ console.log('one');
 
 ## Promise.reject()
 
-`Promise.reject(reason)`方法也会返回一个新的Promise实例，该实例的状态为`rejected`。它的参数用法与`Promise.resolve`方法完全一致。
+`Promise.reject(reason)`方法也会返回一个新的 Promise 实例，该实例的状态为`rejected`。
 
 ```javascript
 var p = Promise.reject('出错了');
 // 等同于
 var p = new Promise((resolve, reject) => reject('出错了'))
 
-p.then(null, function (s){
+p.then(null, function (s) {
   console.log(s)
 });
 // 出错了
 ```
 
 上面代码生成一个Promise对象的实例`p`，状态为`rejected`，回调函数会立即执行。
+
+注意，`Promise.reject()`方法的参数，会原封不动地作为`reject`的理由，变成后续方法的参数。这一点与`Promise.resolve`方法不一致。
+
+```javascript
+const thenable = {
+  then(resolve, reject) {
+    reject('出错了');
+  }
+};
+
+Promise.reject(thenable)
+.catch(e => {
+  console.log(e === thenable)
+})
+// true
+```
+
+上面代码中，`Promise.reject`方法的参数是一个`thenable`对象，执行以后，后面`catch`方法的参数不是`reject`抛出的“出错了”这个字符串，而是`thenable`对象。
 
 ## 两个有用的附加方法
 
@@ -776,7 +794,7 @@ run(g);
 Promise.resolve().then(f)
 ```
 
-上面的写法有一个缺点，就是如果`f`是同步函数，那么它会在下一轮事件循环执行。
+上面的写法有一个缺点，就是如果`f`是同步函数，那么它会在本轮事件循环的末尾执行。
 
 ```javascript
 const f = () => console.log('now');
@@ -798,7 +816,7 @@ console.log('next');
 // next
 ```
 
-上面代码中，第一行是一个立即执行的匿名函数，会立即执行里面的`async`函数，因此如果`f`是同步的，就会得到同步的结果；如果`f`是异步的，就可以用`then`指定下一步，就像下面的写法。
+上面代码中，第二行是一个立即执行的匿名函数，会立即执行里面的`async`函数，因此如果`f`是同步的，就会得到同步的结果；如果`f`是异步的，就可以用`then`指定下一步，就像下面的写法。
 
 ```javascript
 (async () => f())()

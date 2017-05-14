@@ -12,6 +12,7 @@
 - [ECMAScript Daily](https://ecmascript-daily.github.io/): TC39委员会的动态
 - [The TC39 Process](https://tc39.github.io/process-document/): 提案进入正式规格的流程
 - [TC39: A Process Sketch, Stages 0 and 1](https://thefeedbackloop.xyz/tc39-a-process-sketch-stages-0-and-1/): Stage 0 和 Stage 1 的含义
+- [TC39 Process Sketch, Stage 2](https://thefeedbackloop.xyz/tc39-process-sketch-stage-2/): Stage 2 的含义
 
 ## 综合介绍
 
@@ -115,7 +116,7 @@
 - Jason Orendorff, [ES6 In Depth: Collections](https://hacks.mozilla.org/2015/06/es6-in-depth-collections/)：Set和Map结构的设计思想
 - Axel Rauschmayer, [Converting ES6 Maps to and from JSON](http://www.2ality.com/2015/08/es6-map-json.html): 如何将Map与其他数据结构互相转换
 
-## Proxy和Reflect
+## Proxy 和 Reflect
 
 - Nicholas C. Zakas, [Creating defensive objects with ES6 proxies](http://www.nczonline.net/blog/2014/04/22/creating-defensive-objects-with-es6-proxies/)
 - Axel Rauschmayer, [Meta programming with ECMAScript 6 proxies](http://www.2ality.com/2014/12/es6-proxies.html): Proxy详解
@@ -129,8 +130,9 @@
 - Nicolas Bevacqua, [More ES6 Proxy Traps in Depth](http://ponyfoo.com/articles/more-es6-proxy-traps-in-depth)
 - Axel Rauschmayer, [Pitfall: not all objects can be wrapped transparently by proxies](http://www.2ality.com/2016/11/proxying-builtins.html)
 - Bertalan Miklos, [Writing a JavaScript Framework - Data Binding with ES6 Proxies](https://blog.risingstack.com/writing-a-javascript-framework-data-binding-es6-proxy/): 使用 Proxy 实现观察者模式
+- Keith Cirkel, [Metaprogramming in ES6: Part 2 - Reflect](https://www.keithcirkel.co.uk/metaprogramming-in-es6-part-2-reflect/): Reflect API 的详细介绍
 
-## Promise对象
+## Promise 对象
 
 - Jake Archibald, [JavaScript Promises: There and back again](http://www.html5rocks.com/en/tutorials/es6/promises/)
 - Tilde, [rsvp.js](https://github.com/tildeio/rsvp.js)
@@ -179,6 +181,7 @@
 - Daniel Brain, [Understand promises before you start using async/await](https://medium.com/@bluepnume/learn-about-promises-before-you-start-using-async-await-eb148164a9c8): 讨论async/await与Promise的关系
 - Jake Archibald, [Async functions - making promises friendly](https://developers.google.com/web/fundamentals/getting-started/primers/async-functions)
 - Axel Rauschmayer, [ES proposal: asynchronous iteration](http://www.2ality.com/2016/10/asynchronous-iteration.html): 异步遍历器的详细介绍
+- Dima Grossman, [How to write async await without try-catch blocks in Javascript](http://blog.grossman.io/how-to-write-async-await-without-try-catch-blocks-in-javascript/): 除了 try/catch 以外的 async 函数内部捕捉错误的方法
 
 ## Class
 
@@ -206,6 +209,9 @@
 - Jason Orendorff, [ES6 In Depth: Modules](https://hacks.mozilla.org/2015/08/es6-in-depth-modules/): ES6模块设计思想的介绍
 - Ben Newman, [The Importance of import and export](http://benjamn.github.io/empirenode-2015/#/): ES6模块的设计思想
 - ESDiscuss, [Why is "export default var a = 1;" invalid syntax?](https://esdiscuss.org/topic/why-is-export-default-var-a-1-invalid-syntax)
+- Bradley Meck, [ES6 Module Interoperability](https://github.com/nodejs/node-eps/blob/master/002-es6-modules.md): 介绍 Node 如何处理 ES6 语法加载 CommonJS 模块
+- Axel Rauschmayer, [Making transpiled ES modules more spec-compliant](http://www.2ality.com/2017/01/babel-esm-spec-mode.html): ES6 模块编译成 CommonJS 模块的详细介绍
+- Axel Rauschmayer, [ES proposal: import() – dynamically importing ES modules](http://www.2ality.com/2017/01/import-operator.html): import() 的用法
 
 ## 二进制数组
 

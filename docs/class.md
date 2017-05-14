@@ -354,7 +354,7 @@ person.sayName(); // "张三"
 
 ### 私有方法
 
-私有方法是常见需求，但ES6不提供，只能通过变通方法模拟实现。
+私有方法是常见需求，但 ES6 不提供，只能通过变通方法模拟实现。
 
 一种做法是在命名上加以区别。
 
@@ -624,9 +624,11 @@ class B {
 
 // B的实例继承A的实例
 Object.setPrototypeOf(B.prototype, A.prototype);
+const b = new B();
 
-// B继承A的静态属性
+// B的实例继承A的静态属性
 Object.setPrototypeOf(B, A);
+const b = new B();
 ```
 
 《对象的扩展》一章给出过`Object.setPrototypeOf`方法的实现。
@@ -693,7 +695,7 @@ A.__proto__ === Function.prototype // true
 A.prototype.__proto__ === Object.prototype // true
 ```
 
-这种情况下，A作为一个基类（即不存在任何继承），就是一个普通函数，所以直接继承`Funciton.prototype`。但是，`A`调用后返回一个空对象（即`Object`实例），所以`A.prototype.__proto__`指向构造函数（`Object`）的`prototype`属性。
+这种情况下，A作为一个基类（即不存在任何继承），就是一个普通函数，所以直接继承`Function.prototype`。但是，`A`调用后返回一个空对象（即`Object`实例），所以`A.prototype.__proto__`指向构造函数（`Object`）的`prototype`属性。
 
 第三种特殊情况，子类继承`null`。
 
@@ -705,7 +707,7 @@ A.__proto__ === Function.prototype // true
 A.prototype.__proto__ === undefined // true
 ```
 
-这种情况与第二种情况非常像。`A`也是一个普通函数，所以直接继承`Funciton.prototype`。但是，A调用后返回的对象不继承任何方法，所以它的`__proto__`指向`Function.prototype`，即实质上执行了下面的代码。
+这种情况与第二种情况非常像。`A`也是一个普通函数，所以直接继承`Function.prototype`。但是，A调用后返回的对象不继承任何方法，所以它的`__proto__`指向`Function.prototype`，即实质上执行了下面的代码。
 
 ```javascript
 class C extends null {
@@ -775,7 +777,7 @@ class B extends A {
 
 上面代码中，`super()`用在`B`类的`m`方法之中，就会造成句法错误。
 
-第二种情况，`super`作为对象时，指向父类的原型对象。
+第二种情况，`super`作为对象时，在普通方法中，指向父类的原型对象；在静态方法中，指向父类。
 
 ```javascript
 class A {
@@ -794,7 +796,7 @@ class B extends A {
 let b = new B();
 ```
 
-上面代码中，子类`B`当中的`super.p()`，就是将`super`当作一个对象使用。这时，`super`指向`A.prototype`，所以`super.p()`就相当于`A.prototype.p()`。
+上面代码中，子类`B`当中的`super.p()`，就是将`super`当作一个对象使用。这时，`super`在普通方法之中，指向`A.prototype`，所以`super.p()`就相当于`A.prototype.p()`。
 
 这里需要注意，由于`super`指向父类的原型对象，所以定义在父类实例上的方法或属性，是无法通过`super`调用的。
 
@@ -886,6 +888,37 @@ let b = new B();
 ```
 
 上面代码中，`super.x`赋值为`3`，这时等同于对`this.x`赋值为`3`。而当读取`super.x`的时候，读的是`A.prototype.x`，所以返回`undefined`。
+
+如果`super`作为对象，用在静态方法之中，这时`super`将指向父类，而不是父类的原型对象。
+
+```javascript
+class Parent {
+  static myMethod(msg) {
+    console.log('static', msg);
+  }
+
+  myMethod(msg) {
+    console.log('instance', msg);
+  }
+}
+
+class Child extends Parent {
+  static myMethod(msg) {
+    super.myMethod(msg);
+  }
+
+  myMethod(msg) {
+    super.myMethod(msg);
+  }
+}
+
+Child.myMethod(1); // static 1
+
+var child = new Child();
+child.myMethod(2); // instance 2
+```
+
+上面代码中，`super`在静态方法之中指向父类，在普通方法之中指向父类的原型对象。
 
 注意，使用`super`的时候，必须显式指定是作为函数、还是作为对象使用，否则会报错。
 
@@ -1163,9 +1196,9 @@ var descriptor = Object.getOwnPropertyDescriptor(
 
 上面代码中，存值函数和取值函数是定义在`html`属性的描述对象上面，这与ES5完全一致。
 
-## Class的Generator方法
+## Class 的 Generator 方法
 
-如果某个方法之前加上星号（`*`），就表示该方法是一个Generator函数。
+如果某个方法之前加上星号（`*`），就表示该方法是一个 Generator 函数。
 
 ```javascript
 class Foo {
@@ -1186,9 +1219,9 @@ for (let x of new Foo('hello', 'world')) {
 // world
 ```
 
-上面代码中，Foo类的Symbol.iterator方法前有一个星号，表示该方法是一个Generator函数。Symbol.iterator方法返回一个Foo类的默认遍历器，for...of循环会自动调用这个遍历器。
+上面代码中，`Foo`类的`Symbol.iterator`方法前有一个星号，表示该方法是一个 Generator 函数。`Symbol.iterator`方法返回一个`Foo`类的默认遍历器，`for...of`循环会自动调用这个遍历器。
 
-## Class的静态方法
+## Class 的静态方法
 
 类相当于实例的原型，所有在类中定义的方法，都会被实例继承。如果在一个方法前，加上`static`关键字，就表示该方法不会被实例继承，而是直接通过类来调用，这就称为“静态方法”。
 
@@ -1342,7 +1375,7 @@ class MyClass {
   static myStaticProp = 42;
 
   constructor() {
-    console.log(MyClass.myProp); // 42
+    console.log(MyClass.myStaticProp); // 42
   }
 }
 ```
@@ -1362,6 +1395,50 @@ class Foo {
 ```
 
 上面代码中，老写法的静态属性定义在类的外部。整个类生成以后，再生成静态属性。这样让人很容易忽略这个静态属性，也不符合相关代码应该放在一起的代码组织原则。另外，新写法是显式声明（declarative），而不是赋值处理，语义更好。
+
+## 类的私有属性
+
+目前，有一个[提案](https://github.com/tc39/proposal-private-fields)，为`class`加了私有属性。方法是在属性名之前，使用`#`表示。
+
+```javascript
+class Point {
+  #x;
+
+  constructor(x = 0) {
+    #x = +x;
+  }
+
+  get x() { return #x }
+  set x(value) { #x = +value }
+}
+```
+
+上面代码中，`#x`就表示私有属性`x`，在`Point`类之外是读取不到这个属性的。还可以看到，私有属性与实例的属性是可以同名的（比如，`#x`与`get x()`）。
+
+私有属性可以指定初始值，在构造函数执行时进行初始化。
+
+```javascript
+class Point {
+  #x = 0;
+  constructor() {
+    #x; // 0
+  }
+}
+```
+
+之所以要引入一个新的前缀`#`表示私有属性，而没有采用`private`关键字，是因为 JavaScript 是一门动态语言，使用独立的符号似乎是唯一的可靠方法，能够准确地区分一种属性是私有属性。另外，Ruby 语言使用`@`表示私有属性，ES6 没有用这个符号而使用`#`，是因为`@`已经被留给了 Decorator。
+
+该提案只规定了私有属性的写法。但是，很自然地，它也可以用来写私有方法。
+
+```javascript
+class Foo {
+  #a;
+  #b;
+  #sum() { return #a + #b; }
+  printSum() { console.log(#sum()); }
+  constructor(a, b) { #a = a; #b = b; }
+}
+```
 
 ## new.target属性
 
